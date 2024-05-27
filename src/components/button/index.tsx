@@ -1,12 +1,12 @@
-import { ComponentProps } from "react";
+import { ComponentProps, forwardRef } from "react";
 import { Botao } from "./style";
 
 type ButtonProps = ComponentProps<'button'> & {
     variant?: 'default' | 'outline'
 }
 
-export function Button({ children, variant = 'default', ...props }: ButtonProps) {
+export const Button =  forwardRef<HTMLButtonElement, ButtonProps>(function ({ children, variant = 'default', ...props }, ref) {
     return(
-        <Botao {...props} $variant={variant}>{children}</Botao>
+        <Botao {...props} ref={ref} $variant={variant}>{children}</Botao>
     )
-}
+})

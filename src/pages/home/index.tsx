@@ -3,6 +3,8 @@ import { Button } from '../../components/button';
 import { Filters, Header, InputGroup, Main, Section } from './style';
 import { Title } from '../../components/title';
 import { Input } from '../../components/input';
+import { InputMask } from '@react-input/mask';
+import { ButtonIcon } from '../../components/button-icon';
 
 export function Home() {
   return (
@@ -19,11 +21,25 @@ export function Home() {
           <Filters>
             <Title title='saldo' subtitle='Receitas e despesas no período'/>
             <InputGroup>
-              <Input variant='dark' label='Inicio' placeholder="dd/mm/yyyy"/>
-              <Input variant='dark' label='Fim' placeholder="dd/mm/yyyy"/>
+              <InputMask
+                component={Input}
+                mask='dd/mm/yyyy'
+                replacement={{d: /\d/, m: /\d/, y: /\d/}}
+                variant='dark'
+                label='Início'
+                placeholder='dd/mm/yyyy'
+              />
+              <InputMask
+                component={Input}
+                mask='dd/mm/yyyy'
+                replacement={{d: /\d/, m: /\d/, y: /\d/}}
+                variant='dark'
+                label='Fim'
+                placeholder='dd/mm/yyyy'
+              />
+              <ButtonIcon/>
             </InputGroup>
           </Filters>
-          
         </Section>
       </Main>
     </>

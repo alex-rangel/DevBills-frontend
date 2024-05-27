@@ -1,4 +1,4 @@
-import { Constainer } from "./style";
+import { Constainer } from "./styles";
 
 type TitleProps = {
     title: string
