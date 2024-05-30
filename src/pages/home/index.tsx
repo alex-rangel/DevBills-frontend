@@ -1,11 +1,24 @@
 import { Logo } from '../../components/logo';
 import { Button } from '../../components/button';
-import { Filters, Header, InputGroup, Main, Section, Balance, ChartContainer, ChartContent} from './style';
+import { 
+          Filters, 
+          Header, 
+          InputGroup, 
+          Main, Section, 
+          Balance, 
+          ChartContainer, 
+          ChartContent, 
+          Aside, 
+          SearchTransaction,
+          TransactionGroup
+        } from './style';
 import { Title } from '../../components/title';
 import { Input } from '../../components/input';
 import { InputMask } from '@react-input/mask';
 import { ButtonIcon } from '../../components/button-icon';
 import { Card } from '../../components/card';
+import { Transaction } from '../../components/transaction';
+import { CreateCategotyDialog } from '../../components/create-category-dialog';
 
 export function Home() {
   return (
@@ -14,7 +27,7 @@ export function Home() {
         <Logo />
         <div>
           <Button>Nova transação</Button>
-          <Button>Nova categoria</Button>
+          <CreateCategotyDialog/>
         </div>
       </Header>
       <Main>
@@ -80,6 +93,38 @@ export function Home() {
             </ChartContent>
           </ChartContainer>
         </Section>
+        <Aside>
+          <header>
+            <Title title='Transações' subtitle='Receitas e Gastos no Periodo'/>
+            <SearchTransaction>
+              <Input variant='black' placeholder='Procurar transação'/>
+              <ButtonIcon/>
+            </SearchTransaction>
+          </header>
+          <TransactionGroup>
+            <Transaction 
+            id={1}
+            amount={20000}
+            date="09/05/2024"
+            category={{title: "Alimentação", color: '#ff33bb'}}
+            title='Mercado'
+            />
+            <Transaction 
+            id={1}
+            amount={20000}
+            date="09/05/2024"
+            category={{title: "Alimentação", color: '#ff33bb'}}
+            title='Mercado'
+            />
+            <Transaction 
+            id={1}
+            amount={20000}
+            date="09/05/2024"
+            category={{title: "Alimentação", color: '#ff33bb'}}
+            title='Mercado'
+            />
+            </TransactionGroup>
+        </Aside>
       </Main>
     </>
   );
