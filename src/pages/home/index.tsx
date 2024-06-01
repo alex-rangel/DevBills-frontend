@@ -1,5 +1,4 @@
 import { Logo } from '../../components/logo';
-import { Button } from '../../components/button';
 import { 
           Filters, 
           Header, 
@@ -19,6 +18,9 @@ import { ButtonIcon } from '../../components/button-icon';
 import { Card } from '../../components/card';
 import { Transaction } from '../../components/transaction';
 import { CreateCategotyDialog } from '../../components/create-category-dialog';
+import { CreateTransactonDialog } from '../../components/create-transaction-dialog';
+import { CategoriesPieChart } from '../../components/categories-pie-chart';
+import { FinancialEvolutionBarChart } from '../../components/financial-evolution-bar-chart';
 
 export function Home() {
   return (
@@ -26,7 +28,7 @@ export function Home() {
       <Header>
         <Logo />
         <div>
-          <Button>Nova transação</Button>
+          <CreateTransactonDialog/>
           <CreateCategotyDialog/>
         </div>
       </Header>
@@ -67,7 +69,7 @@ export function Home() {
               />
             </header>
             <ChartContent>
-
+              <CategoriesPieChart/>
             </ChartContent>
           </ChartContainer>
           <ChartContainer>
@@ -89,7 +91,7 @@ export function Home() {
               </div>
             </header>
             <ChartContent>
-              
+              <FinancialEvolutionBarChart/>
             </ChartContent>
           </ChartContainer>
         </Section>
