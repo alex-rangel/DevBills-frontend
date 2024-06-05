@@ -1,6 +1,6 @@
 import { ArrowCircleDownRight, ArrowCircleUpRight, CurrencyCircleDollar } from "@phosphor-icons/react";
 import { Container } from "./styles";
-import { formatCurrency } from "../utils/format-currency";
+import { formatCurrency } from "../../utils/format-currency";
 
 type CardProps = {
     variant?: 'balance' | 'incomes' | 'expenses';

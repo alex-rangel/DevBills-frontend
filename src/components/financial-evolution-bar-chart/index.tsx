@@ -2,7 +2,7 @@ import { ResponsiveBar } from "@nivo/bar";
 import dayjs from "dayjs";
 import ptBRlocale from "dayjs/locale/pt-br";
 import { useMemo } from "react";
-import { formatCurrency } from "../utils/format-currency";
+import { formatCurrency } from "../../utils/format-currency";
 import { theme } from "../../styles/theme";
 
 dayjs.locale(ptBRlocale)

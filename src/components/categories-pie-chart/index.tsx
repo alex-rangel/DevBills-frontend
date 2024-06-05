@@ -1,7 +1,7 @@
 import { ResponsivePie } from "@nivo/pie";
 import { useMemo } from "react";
 import { theme } from "../../styles/theme";
-import { formatCurrency } from "../utils/format-currency";
+import { formatCurrency } from "../../utils/format-currency";
 
 const apiData = [
     {
