@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.6.0",
     "@nivo/bar": "^0.87.0",
     "@nivo/pie": "^0.87.0",
     "@phosphor-icons/react": "^2.1.5",
@@ -18,12 +19,15 @@
     "@react-input/number-format": "^1.0.27",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
+    "dotenv": "^16.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.51.5",
     "styled-components": "^6.1.11",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/node": "^20.14.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^7.2.0",

@@ -20,6 +20,7 @@ export function FetchAPIProvider({children}: FetchAPIProviderProps) {
     const [categories, setCategories] = useState<Category[]>([])
 
     const createCategory = useCallback(async (data: CreateCategoryData) => {
+        
         await APIService.createCategory(data)
     }, [])
 

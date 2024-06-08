@@ -7,5 +7,5 @@ export const createCategorySchema = z.object({
         .max(255),
     color: z
         .string()
-        .regex(/^#[A-Fa-f0-9]{6}s/, {message: 'Deve seguir o padrão #rrggbb'})
+        .regex(/^#[A-Fa-f0-9]{6}$/, {message: 'Deve seguir o padrão #rrggbb'})
 })
