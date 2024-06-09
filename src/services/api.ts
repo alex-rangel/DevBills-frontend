@@ -1,6 +1,8 @@
 import axios from "axios"
 
-import { CreateCategory } from "./api-types"
+
+
+import { CreateCategory, CreateTransaction, Dashboard, DashboardFilters, FinancialEvolution, FinancialEvolutionFilters, Transaction, TransactionsFilter } from "./api-types"
 import { Category } from "./api-types"
 
 export class APIService {
@@ -9,9 +11,25 @@ export class APIService {
         //process.env.REACT_APP_API,
     })
 
+    static async getDashboard({
+      beginDate,
+      endDate,
+    }: DashboardFilters): Promise<Dashboard> {
+      const { data } = await APIService.client.get<Dashboard>(
+        '/transactions/dashboard',
+        {
+          params: {
+            beginDate,
+            endDate,
+          },
+        },
+      );
+  
+      return data;
+    }
+
     static async createCategory(createCategoryData: CreateCategory): Promise<Category> {
 
-        console.log(createCategoryData)
         const { data } = await this.client.post<Category>('categories', createCategoryData)
 
         return data
@@ -23,4 +41,50 @@ export class APIService {
 
         return data
     }
+
+    static async createTransaction(
+        createTransactionData: CreateTransaction,
+      ): Promise<Transaction> {
+        const { data } = await APIService.client.post<Transaction>(
+          '/transactions',
+          createTransactionData,
+        );
+    
+        return data;
+      }
+    
+      static async getTransactions({
+        title,
+        categoryId,
+        beginDate,
+        endDate,
+      }: TransactionsFilter): Promise<Transaction[]> {
+        const { data } = await APIService.client.get<Transaction[]>(
+          '/transactions',
+          {
+            params: {
+              ...(title?.length && { title }),
+              ...(categoryId?.length && { categoryId }),
+              beginDate,
+              endDate,
+            },
+          },
+        );
+    
+        return data;
+      }
+
+      static async getFinancialEvolution({
+        year,
+      }: FinancialEvolutionFilters): Promise<FinancialEvolution[]> {
+        const { data } = await APIService.client.get<FinancialEvolution[]>(
+          '/transactions/financial-evolution',
+          {
+            params: {
+              year,
+            },
+          },
+        );
+        return data;
+      }
 }

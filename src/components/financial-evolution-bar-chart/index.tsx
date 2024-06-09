@@ -4,48 +4,9 @@ import ptBRlocale from "dayjs/locale/pt-br";
 import { useMemo } from "react";
 import { formatCurrency } from "../../utils/format-currency";
 import { theme } from "../../styles/theme";
+import { FinancialEvolution } from "../../services/api-types";
 
 dayjs.locale(ptBRlocale)
-
-
-const apiData = [
-    {
-        _id: {
-            year: 2023,
-            month: 1,
-        },
-        balance: 68900,
-        incomes: 76343,
-        expenses: 48399,
-    },
-    {
-        _id: {
-            year: 2023,
-            month: 2,
-        },
-        balance: 68900,
-        incomes: 76343,
-        expenses: 48399,
-    },
-    {
-        _id: {
-            year: 2023,
-            month: 3,
-        },
-        balance: 68900,
-        incomes: 76343,
-        expenses: 48399,
-    },
-    {
-        _id: {
-            year: 2023,
-            month: 4,
-        },
-        balance: 68900,
-        incomes: 76343,
-        expenses: 48399,
-    },
-]
 
 type ChartData = {
     month:string
@@ -54,17 +15,31 @@ type ChartData = {
     Gastos: number
 }
 
-export function FinancialEvolutionBarChart() {
-    const data = useMemo<ChartData[]>(() => {
-        const chartData: ChartData[] = apiData.map((item) => ({
-            month: dayjs(`${item._id.year}-${item._id.month}-01`).format('MMM'),
-            Saldo: item.balance,
-            Receitas: item.incomes,
-            Gastos: item.expenses,
-        }))
+type FinancialEvolutionBarChartProps = {
+    financialEvolution?: FinancialEvolution[];
+  };
 
-        return chartData
-    }, [])
+export function FinancialEvolutionBarChart({
+  financialEvolution,
+}: FinancialEvolutionBarChartProps) {
+  const data = useMemo<ChartData[]>(() => {
+    if (financialEvolution?.length) {
+      const chartData: ChartData[] = financialEvolution.map((item) => {
+        const [year, month] = item._id;
+
+        return {
+          month: dayjs(`${year}-${month}-01`).format('MMM'),
+          Saldo: item.balance,
+          Receitas: item.incomes,
+          Gastos: item.expenses,
+        };
+      });
+
+      return chartData;
+    }
+
+    return [];
+  }, [financialEvolution]);
 
     return <ResponsiveBar 
         data={data} 

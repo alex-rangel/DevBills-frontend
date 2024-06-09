@@ -1,4 +1,5 @@
 import { Logo } from '../../components/logo';
+import { useForm } from 'react-hook-form';
 import { 
           Filters, 
           Header, 
@@ -9,7 +10,8 @@ import {
           ChartContent, 
           Aside, 
           SearchTransaction,
-          TransactionGroup
+          TransactionGroup,
+          CategoryBadge
         } from './style';
 import { Title } from '../../components/title';
 import { Input } from '../../components/input';
@@ -19,10 +21,105 @@ import { Card } from '../../components/card';
 import { Transaction } from '../../components/transaction';
 import { CreateCategotyDialog } from '../../components/create-category-dialog';
 import { CreateTransactonDialog } from '../../components/create-transaction-dialog';
-import { CategoriesPieChart } from '../../components/categories-pie-chart';
+import { CategoriesPieChart, CategoryProps } from '../../components/categories-pie-chart';
 import { FinancialEvolutionBarChart } from '../../components/financial-evolution-bar-chart';
+import { FinancialEvolutionFilterData, TransactionsFilterData } from '../../validators/types';
+import dayjs from 'dayjs';
+import { transactionsFilterSchema } from '../../validators/schemas';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useCallback, useEffect, useState } from 'react';
+import { useFetchAPI } from '../../hooks/useFetchAPI';
+import { X } from '@phosphor-icons/react';
 
 export function Home() {
+
+  const transactionsFilterForm = useForm<TransactionsFilterData>({
+    defaultValues: {
+      title: '',
+      categoryId: '',
+      beginDate: dayjs().startOf('month').format('DD/MM/YYYY'),
+      endDate: dayjs().endOf('month').format('DD/MM/YYYY'),
+    },
+    resolver: zodResolver(transactionsFilterSchema),
+  });
+
+  const financialEvolutionFilterForm = useForm<FinancialEvolutionFilterData>({
+    defaultValues: {
+      year: dayjs().get('year').toString(),
+    },
+  });
+
+  const { 
+          transactions,
+          dashboard, 
+          fetchTransactions, 
+          fetchDashboard,
+          fetchFinancialEvolution,
+          financialEvolution
+        } = useFetchAPI()
+
+  useEffect(() => {
+
+    const { beginDate, endDate } = transactionsFilterForm.getValues()
+    fetchDashboard({ beginDate, endDate })
+    fetchTransactions(transactionsFilterForm.getValues());
+    fetchFinancialEvolution(financialEvolutionFilterForm.getValues())
+  
+  }, [
+    fetchTransactions,
+    transactionsFilterForm,
+    fetchDashboard,
+    fetchFinancialEvolution,
+    financialEvolutionFilterForm
+  ]);
+
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryProps | null>(null);
+
+    const handleSelectCategory = useCallback(
+      async ({ id, title, color }: CategoryProps) => {
+        setSelectedCategory({ id, title, color });
+        transactionsFilterForm.setValue('categoryId', id);
+
+        await fetchTransactions(transactionsFilterForm.getValues())
+
+      },
+      [transactionsFilterForm, fetchTransactions],
+    );
+
+    const handleDeselectCategory = useCallback( async () => {
+      setSelectedCategory(null);
+      transactionsFilterForm.setValue('categoryId', '');
+
+      await fetchTransactions(transactionsFilterForm.getValues())
+
+    }, [transactionsFilterForm, fetchTransactions]);
+
+    const onSubmitTransactions = useCallback(
+      async (data: TransactionsFilterData) => {
+        await fetchTransactions(data);
+      },
+      [fetchTransactions],
+    );
+
+    const onSubmitDashboard = useCallback(
+      async (data: TransactionsFilterData) => {
+        const { beginDate, endDate } = data;
+  
+        await fetchDashboard({ beginDate, endDate });
+        await fetchTransactions(data);
+      },
+  
+      [fetchDashboard, fetchTransactions],
+    );
+
+    const onSubmitFinancialEvolution = useCallback(
+      async (data: FinancialEvolutionFilterData) => {
+        await fetchFinancialEvolution(data);
+      },
+      [fetchFinancialEvolution],
+    );
+
   return (
     <>
       <Header>
@@ -39,27 +136,29 @@ export function Home() {
             <InputGroup>
               <InputMask
                 component={Input}
-                mask='dd/mm/yyyy'
-                replacement={{d: /\d/, m: /\d/, y: /\d/}}
+                mask='dd/mm/aaaa'
+                replacement={{d: /\d/, m: /\d/, a: /\d/}}
                 variant='dark'
                 label='Início'
-                placeholder='dd/mm/yyyy'
+                placeholder='dd/mm/aaaa'
+                {...transactionsFilterForm.register('beginDate')}
               />
               <InputMask
                 component={Input}
-                mask='dd/mm/yyyy'
-                replacement={{d: /\d/, m: /\d/, y: /\d/}}
+                mask='dd/mm/aaaa'
+                replacement={{d: /\d/, m: /\d/, a: /\d/}}
                 variant='dark'
                 label='Fim'
-                placeholder='dd/mm/yyyy'
+                placeholder='dd/mm/aaaa'
+                {...transactionsFilterForm.register('endDate')}
               />
-              <ButtonIcon/>
+              <ButtonIcon onClick={transactionsFilterForm.handleSubmit(onSubmitDashboard)}/>
             </InputGroup>
           </Filters>
           <Balance>
-            <Card title='Saldo' amount={1000000}/>
-            <Card title='Saldo' amount={1000000} variant='incomes'/>
-            <Card title='Saldo' amount={1000000} variant='expenses'/>
+            <Card title='Saldo' amount={dashboard?.balance?.balance || 0}/>
+            <Card title='Receitas' amount={dashboard?.balance?.incomes || 0} variant='incomes'/>
+            <Card title='Gastos' amount={dashboard?.balance?.expenses * -1 || 0} variant='expenses'/>
           </Balance>
           <ChartContainer>
             <header>
@@ -67,9 +166,18 @@ export function Home() {
               title='Gastos' 
               subtitle='Despesas por categoria no periodo'
               />
+              {selectedCategory && (
+                <CategoryBadge 
+                  $color={selectedCategory.color} 
+                  onClick={handleDeselectCategory} 
+                >
+                <X />
+                {selectedCategory.title.toUpperCase()}
+                </CategoryBadge>
+              )}
             </header>
             <ChartContent>
-              <CategoriesPieChart/>
+              <CategoriesPieChart expenses={dashboard.expenses} onClick={handleSelectCategory}/>
             </ChartContent>
           </ChartContainer>
           <ChartContainer>
@@ -81,17 +189,18 @@ export function Home() {
               <div className='divInput'>
                 <InputMask
                   component={Input}
-                  mask='yyyy'
-                  replacement={{y: /\d/}}
+                  mask='aaaa'
+                  replacement={{a: /\d/}}
                   variant='black'
                   label='ano'
-                  placeholder='yyyy'
+                  placeholder='aaaa'
+                  {...financialEvolutionFilterForm.register('year')}
                 />
-                <ButtonIcon/>
+                <ButtonIcon onClick={financialEvolutionFilterForm.handleSubmit(onSubmitFinancialEvolution)}/>
               </div>
             </header>
             <ChartContent>
-              <FinancialEvolutionBarChart/>
+              <FinancialEvolutionBarChart financialEvolution={financialEvolution}/>
             </ChartContent>
           </ChartContainer>
         </Section>
@@ -99,32 +208,32 @@ export function Home() {
           <header>
             <Title title='Transações' subtitle='Receitas e Gastos no Periodo'/>
             <SearchTransaction>
-              <Input variant='black' placeholder='Procurar transação'/>
-              <ButtonIcon/>
+              <Input 
+                variant='black' 
+                placeholder='Procurar transação' 
+                {...transactionsFilterForm.register('title')}
+              />
+              <ButtonIcon onClick={transactionsFilterForm.handleSubmit(onSubmitTransactions)}/>
             </SearchTransaction>
           </header>
           <TransactionGroup>
-            <Transaction 
-            id={1}
-            amount={20000}
-            date="09/05/2024"
-            category={{title: "Alimentação", color: '#ff33bb'}}
-            title='Mercado'
-            />
-            <Transaction 
-            id={1}
-            amount={20000}
-            date="09/05/2024"
-            category={{title: "Alimentação", color: '#ff33bb'}}
-            title='Mercado'
-            />
-            <Transaction 
-            id={1}
-            amount={20000}
-            date="09/05/2024"
-            category={{title: "Alimentação", color: '#ff33bb'}}
-            title='Mercado'
-            />
+          {transactions?.length && 
+              transactions?.map((item, index) => (
+                <Transaction
+                  key={item._id}
+                  id={index + 1}
+                  amount={
+                    item.type === 'expense' ? item.amount * -1 : item.amount
+                  }
+                  date={dayjs(item.date).add(3, 'hours').format('DD/MM/YYYY')}
+                  category={{
+                    title: item.category.title,
+                    color: item.category.color,
+                  }}
+                  title={item.title}
+                  variant={item.type}
+                />
+                ))}
             </TransactionGroup>
         </Aside>
       </Main>
